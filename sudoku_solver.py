@@ -16,37 +16,33 @@ def get_grid_mapping():
     inv_grid_mapping = {}
     c = 1
 
-    for i in range(1, 4):
-        for j in range(1, 4):
-            for k in range(1, 4):
-                for l in range(1, 4):
-                    for m in range(1, 10):
-                        predicate = 'grid_{}_{}_{}_{}_{}'.format(i, j, k, l, m)
-                        grid_mapping[predicate] = c
-                        inv_grid_mapping[c] = predicate
-                        c += 1
+    for i in range(1, 10):
+        for j in range(1, 10):
+            for k in range(1, 10):
+                predicate = 'grid_{}_{}_{}'.format(i, j, k)
+                grid_mapping[predicate] = c
+                inv_grid_mapping[c] = predicate
+                c += 1
 
     return grid_mapping, inv_grid_mapping
 
 def add_clauses(grid_mapping, inv_grid_mapping):
     sudoku_cnf = Glucose4()
 
-    for i in range(1, 4):
-        for j in range(1, 4):
-            for k in range(1, 4):
-                for l in range(1, 4):
-                    clause = []
+    for i in range(1, 10):
+        for j in range(1, 10):
+            clause = []
 
-                    for m in range(1, 10):
-                        predicate = 'grid_{}_{}_{}_{}_{}'.format(i, j, k, l, m)
-                        clause += [grid_mapping[predicate]]
+            for k in range(1, 10):
+                predicate = 'grid_{}_{}_{}'.format(i, j, k)
+                clause += [grid_mapping[predicate]]
 
-                        for n in range(m + 1, 10):
-                            sub_predicate = 'grid_{}_{}_{}_{}_{}'.format(i, j, k, l, n)
-                            sub_clause = [-grid_mapping[predicate], -grid_mapping[sub_predicate]]
-                            sudoku_cnf.add_clause(sub_clause)
+                for l in range(k + 1, 10):
+                    sub_predicate = 'grid_{}_{}_{}'.format(i, j, l)
+                    sub_clause = [-grid_mapping[predicate], -grid_mapping[sub_predicate]]
+                    sudoku_cnf.add_clause(sub_clause)
 
-                    sudoku_cnf.add_clause(clause)
+            sudoku_cnf.add_clause(clause)
 
     if sudoku_cnf.solve():
         sudoku = [i for i in sudoku_cnf.get_model() if i > 0]
