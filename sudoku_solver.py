@@ -63,6 +63,20 @@ def add_clauses(grid_mapping):
                     sub_predicate = 'grid_{}_{}_{}'.format(l, i, j)
                     clause = [-grid_mapping[predicate], -grid_mapping[sub_predicate]]
                     sudoku_cnf.add_clause(clause)
+    
+    for i in 1, 4, 7:
+        for j in 1, 4, 7:
+            for k in range(i, i + 3):
+                for l in range(j, j + 3):
+                    for m in range(1, 10):
+                        predicate = 'grid_{}_{}_{}'.format(k, l, m)
+
+                        for n in range(i, i + 3):
+                            for p in range(j, j + 3):
+                                if k != n and l != p:
+                                    sub_predicate = 'grid_{}_{}_{}'.format(n, p, m)
+                                    clause = [-grid_mapping[predicate], -grid_mapping[sub_predicate]]
+                                    sudoku_cnf.add_clause(clause)
 
     return sudoku_cnf
 
