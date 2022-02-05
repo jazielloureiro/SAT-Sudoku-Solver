@@ -26,7 +26,7 @@ def get_grid_mapping():
 
     return grid_mapping, inv_grid_mapping
 
-def add_clauses(grid_mapping, inv_grid_mapping):
+def add_clauses(grid_mapping):
     sudoku_cnf = Glucose4()
 
     for i in range(1, 10):
@@ -54,13 +54,41 @@ def add_clauses(grid_mapping, inv_grid_mapping):
                     clause = [-grid_mapping[predicate], -grid_mapping[sub_predicate]]
                     sudoku_cnf.add_clause(clause)
 
-    if sudoku_cnf.solve():
-        sudoku = [i for i in sudoku_cnf.get_model() if i > 0]
+    for i in range(1, 10):
+        for j in range(1, 10):
+            for k in range(1, 10):
+                predicate = 'grid_{}_{}_{}'.format(k, i, j)
 
-        for i in sudoku:
-            print(inv_grid_mapping[i])
+                for l in range(k + 1, 10):
+                    sub_predicate = 'grid_{}_{}_{}'.format(l, i, j)
+                    clause = [-grid_mapping[predicate], -grid_mapping[sub_predicate]]
+                    sudoku_cnf.add_clause(clause)
+
+    return sudoku_cnf
+
+def print_grid(sudoku_solved):
+    sudoku = [[0] * 9 for i in range(9)]
+
+    for i in sudoku_solved:
+        row, col, num = [int(i) for i in i[-5:].split('_')]
+        sudoku[row-1][col-1] = num
+    
+    print('-------------------------------------')
+
+    for i in range(9):
+        for j in range(9):
+            print('| {} '.format(sudoku[i][j]), end='')
+
+        if i < 8:
+            print('|\n|---+---+---+---+---+---+---+---+---|')
+
+    print('|\n-------------------------------------')
 
 if __name__ == '__main__':
     grid_mapping, inv_grid_mapping = get_grid_mapping()
 
-    add_clauses(grid_mapping, inv_grid_mapping)
+    sudoku_cnf = add_clauses(grid_mapping)
+
+    if sudoku_cnf.solve():
+        sudoku_solved = [inv_grid_mapping[i] for i in sudoku_cnf.get_model() if i > 0]
+        print_grid(sudoku_solved)
