@@ -1,14 +1,13 @@
 #!/bin/python3
 
-def read_board(file):
-    board = []
+def read_grid(file):
+    grid = []
 
     with open(file) as data:
         for line in data:
-            line = line.split(' ')
-            board += [[int(i) for i in line]]
+            grid += [[int(i) for i in line.split(' ')]]
 
-    return board
+    return grid
 
 if __name__ == '__main__':
-    print(read_board('data/sudoku'))
+    print(read_grid('data/sudoku'))
