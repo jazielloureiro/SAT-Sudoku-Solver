@@ -9,7 +9,7 @@ def read_grid(file):
 
     return grid
 
-def add_clauses():
+def get_grid_mapping():
     grid_mapping = {}
     inv_grid_mapping = {}
     c = 0
@@ -24,9 +24,14 @@ def add_clauses():
                         inv_grid_mapping[c] = predicate
                         c += 1
 
-    for i, j in grid_mapping.items():
-        print(i, j)
+    return grid_mapping, inv_grid_mapping
 
 if __name__ == '__main__':
     # print(read_grid('data/sudoku'))
-    add_clauses()
+    grid_mapping, inv_grid_mapping = get_grid_mapping()
+
+    for i, j in grid_mapping.items():
+        print(i, j)
+
+    for i, j in inv_grid_mapping.items():
+        print(i, j)
