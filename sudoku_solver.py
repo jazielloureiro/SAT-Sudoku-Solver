@@ -1,5 +1,7 @@
 #!/bin/python3
 
+from pysat.solvers import Glucose4, Solver
+
 def read_grid(file):
     grid = []
 
@@ -12,7 +14,7 @@ def read_grid(file):
 def get_grid_mapping():
     grid_mapping = {}
     inv_grid_mapping = {}
-    c = 0
+    c = 1
 
     for i in range(1, 4):
         for j in range(1, 4):
@@ -26,12 +28,27 @@ def get_grid_mapping():
 
     return grid_mapping, inv_grid_mapping
 
+def add_clauses(grid_mapping, inv_grid_mapping):
+    sudoku_cnf = Glucose4()
+
+    for i in range(1, 4):
+        for j in range(1, 4):
+            for k in range(1, 4):
+                for l in range(1, 4):
+                    clause = []
+
+                    for m in range(1, 10):
+                        clause += [grid_mapping['grid_{}_{}_{}_{}_{}'.format(i, j, k, l, m)]]
+
+                    sudoku_cnf.add_clause(clause)
+
+    if sudoku_cnf.solve():
+        sudoku = [i for i in sudoku_cnf.get_model() if i > 0]
+
+        for i in sudoku:
+            print(inv_grid_mapping[i])
+
 if __name__ == '__main__':
-    # print(read_grid('data/sudoku'))
     grid_mapping, inv_grid_mapping = get_grid_mapping()
 
-    for i, j in grid_mapping.items():
-        print(i, j)
-
-    for i, j in inv_grid_mapping.items():
-        print(i, j)
+    add_clauses(grid_mapping, inv_grid_mapping)
