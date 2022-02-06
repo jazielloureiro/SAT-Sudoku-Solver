@@ -1,6 +1,18 @@
 #!/bin/python3
 
 from pysat.solvers import Glucose4, Solver
+import argparse
+
+def main(args):
+    grid = read_grid(args.filepath)
+
+    grid_mapping, inv_grid_mapping = get_grid_mapping()
+
+    sudoku_cnf = add_clauses(grid, grid_mapping)
+
+    if sudoku_cnf.solve():
+        sudoku_solved = [inv_grid_mapping[i] for i in sudoku_cnf.get_model() if i > 0]
+        print_grid(sudoku_solved, args.simple_out)
 
 def read_grid(file):
     grid = []
@@ -86,31 +98,38 @@ def add_clauses(grid, grid_mapping):
 
     return sudoku_cnf
 
-def print_grid(sudoku_solved):
+def print_grid(sudoku_solved, simple_out):
     sudoku = [[0] * 9 for i in range(9)]
 
     for i in sudoku_solved:
         row, col, num = [int(i) for i in i[-5:].split('_')]
         sudoku[row-1][col-1] = num
     
-    print('-------------------------------------')
+    if simple_out:
+        for i in sudoku:
+            for j in i:
+                print(j, end=' ')
+            print()
+    else:
+        print('-------------------------------------')
 
-    for i in range(9):
-        for j in range(9):
-            print('| {} '.format(sudoku[i][j]), end='')
+        for i in range(9):
+            for j in range(9):
+                print('| {} '.format(sudoku[i][j]), end='')
 
-        if i < 8:
-            print('|\n|---+---+---+---+---+---+---+---+---|')
+            if i < 8:
+                print('|\n|---+---+---+---+---+---+---+---+---|')
 
-    print('|\n-------------------------------------')
+        print('|\n-------------------------------------')
 
 if __name__ == '__main__':
-    grid = read_grid('data/sudoku')
+    parser = argparse.ArgumentParser()
 
-    grid_mapping, inv_grid_mapping = get_grid_mapping()
+    parser.add_argument('filepath')
+    parser.add_argument('-s', '--simple-out',
+                        action='store_true',
+                        help='show a simplified output')
 
-    sudoku_cnf = add_clauses(grid, grid_mapping)
+    args = parser.parse_args()
 
-    if sudoku_cnf.solve():
-        sudoku_solved = [inv_grid_mapping[i] for i in sudoku_cnf.get_model() if i > 0]
-        print_grid(sudoku_solved)
+    main(args)
