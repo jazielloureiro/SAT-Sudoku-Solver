@@ -1,6 +1,6 @@
 #!/bin/python3
 
-from pysat.solvers import Glucose4, Solver
+from pysat.solvers import Glucose4
 import argparse
 
 def main(args):
