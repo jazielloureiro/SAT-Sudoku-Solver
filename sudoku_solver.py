@@ -11,9 +11,8 @@ def main(args):
     sudoku_cnf = add_clauses(grid, grid_mapping)
 
     if sudoku_cnf.solve():
-        print(sudoku_cnf.get_model())
-        # sudoku_solved = [inv_grid_mapping[i] for i in sudoku_cnf.get_model() if i > 0]
-        # print_grid(sudoku_solved, args.simple_out)
+        sudoku_solved = [inv_grid_mapping[i-1] for i in sudoku_cnf.get_model() if i > 0]
+        print_grid(sudoku_solved, args.simple_out)
 
 def read_grid(file):
     grid = []
@@ -101,8 +100,8 @@ def print_grid(sudoku_solved, simple_out):
     sudoku = [[0] * 9 for i in range(9)]
 
     for i in sudoku_solved:
-        row, col, num = [int(i) for i in i[-5:].split('_')]
-        sudoku[row-1][col-1] = num
+        row, col, num = i
+        sudoku[row][col] = num + 1
     
     if simple_out:
         for i in sudoku:
