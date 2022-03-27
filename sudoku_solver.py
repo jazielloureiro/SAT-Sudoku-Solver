@@ -8,11 +8,13 @@ def main(args):
 
     grid_mapping, inv_grid_mapping = get_grid_mapping()
 
-    sudoku_cnf = add_clauses(grid, grid_mapping)
+    print(grid_mapping)
+    print(inv_grid_mapping)
+    # sudoku_cnf = add_clauses(grid, grid_mapping)
 
-    if sudoku_cnf.solve():
-        sudoku_solved = [inv_grid_mapping[i] for i in sudoku_cnf.get_model() if i > 0]
-        print_grid(sudoku_solved, args.simple_out)
+    # if sudoku_cnf.solve():
+        # sudoku_solved = [inv_grid_mapping[i] for i in sudoku_cnf.get_model() if i > 0]
+        # print_grid(sudoku_solved, args.simple_out)
 
 def read_grid(file):
     grid = []
@@ -24,16 +26,15 @@ def read_grid(file):
     return grid
 
 def get_grid_mapping():
-    grid_mapping = {}
-    inv_grid_mapping = {}
+    grid_mapping = [[[0 for _ in range(9)] for _ in range(9)] for _ in range(9)]
+    inv_grid_mapping = []
     c = 1
 
-    for i in range(1, 10):
-        for j in range(1, 10):
-            for k in range(1, 10):
-                predicate = 'grid_{}_{}_{}'.format(i, j, k)
-                grid_mapping[predicate] = c
-                inv_grid_mapping[c] = predicate
+    for i in range(9):
+        for j in range(9):
+            for k in range(9):
+                grid_mapping[i][j][k] = c
+                inv_grid_mapping.append([i, j, k])
                 c += 1
 
     return grid_mapping, inv_grid_mapping
