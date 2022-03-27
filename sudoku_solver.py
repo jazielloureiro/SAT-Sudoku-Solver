@@ -10,7 +10,8 @@ def main(args):
 
     sudoku_cnf = add_clauses(grid, grid_mapping)
 
-    # if sudoku_cnf.solve():
+    if sudoku_cnf.solve():
+        print(sudoku_cnf.get_model())
         # sudoku_solved = [inv_grid_mapping[i] for i in sudoku_cnf.get_model() if i > 0]
         # print_grid(sudoku_solved, args.simple_out)
 
@@ -48,11 +49,7 @@ def add_clauses(grid, grid_mapping):
     
     add_box_clauses(sudoku_cnf, grid_mapping)
 
-    for i in range(9):
-        for j in range(9):
-            if grid[i][j] != 0:
-                predicate = 'grid_{}_{}_{}'.format(i + 1, j + 1, grid[i][j])
-                sudoku_cnf.add_clause([grid_mapping[predicate]])
+    add_grid_clauses(sudoku_cnf, grid, grid_mapping)
 
     return sudoku_cnf
 
@@ -93,6 +90,12 @@ def add_box_clauses(sudoku_cnf, grid_mapping):
                             for p in range(j, j + 3):
                                 if k != n and l != p:
                                     sudoku_cnf.add_clause([-grid_mapping[k][l][m], -grid_mapping[n][p][m]])
+
+def add_grid_clauses(sudoku_cnf, grid, grid_mapping):
+    for i in range(9):
+        for j in range(9):
+            if grid[i][j] != 0:
+                sudoku_cnf.add_clause([grid_mapping[i][j][grid[i][j] - 1]])
 
 def print_grid(sudoku_solved, simple_out):
     sudoku = [[0] * 9 for i in range(9)]
