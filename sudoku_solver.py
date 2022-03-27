@@ -42,15 +42,7 @@ def add_clauses(grid, grid_mapping):
 
     add_square_clauses(sudoku_cnf, grid_mapping)
 
-    for i in range(9):
-        for j in range(9):
-            for k in range(9):
-                predicate = 'grid_{}_{}_{}'.format(i, k, j)
-
-                for l in range(k + 1, 10):
-                    sub_predicate = 'grid_{}_{}_{}'.format(i, l, j)
-                    clause = [-grid_mapping[predicate], -grid_mapping[sub_predicate]]
-                    sudoku_cnf.add_clause(clause)
+    add_row_clauses(sudoku_cnf, grid_mapping)
 
     for i in range(9):
         for j in range(9):
@@ -96,6 +88,13 @@ def add_square_clauses(sudoku_cnf, grid_mapping):
                     sudoku_cnf.add_clause([-grid_mapping[i][j][k], -grid_mapping[i][j][l]])
 
             sudoku_cnf.add_clause(sqr_clause)
+
+def add_row_clauses(sudoku_cnf, grid_mapping):
+    for i in range(9):
+        for j in range(9):
+            for k in range(9):
+                for l in range(k + 1, 9):
+                    sudoku_cnf.add_clause([-grid_mapping[i][k][j], -grid_mapping[i][l][j]])
 
 def print_grid(sudoku_solved, simple_out):
     sudoku = [[0] * 9 for i in range(9)]
