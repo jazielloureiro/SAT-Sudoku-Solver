@@ -8,9 +8,7 @@ def main(args):
 
     grid_mapping, inv_grid_mapping = get_grid_mapping()
 
-    print(grid_mapping)
-    print(inv_grid_mapping)
-    # sudoku_cnf = add_clauses(grid, grid_mapping)
+    sudoku_cnf = add_clauses(grid, grid_mapping)
 
     # if sudoku_cnf.solve():
         # sudoku_solved = [inv_grid_mapping[i] for i in sudoku_cnf.get_model() if i > 0]
@@ -42,24 +40,11 @@ def get_grid_mapping():
 def add_clauses(grid, grid_mapping):
     sudoku_cnf = Glucose4()
 
-    for i in range(1, 10):
-        for j in range(1, 10):
-            clause = []
+    add_square_clauses(sudoku_cnf, grid_mapping)
 
-            for k in range(1, 10):
-                predicate = 'grid_{}_{}_{}'.format(i, j, k)
-                clause += [grid_mapping[predicate]]
-
-                for l in range(k + 1, 10):
-                    sub_predicate = 'grid_{}_{}_{}'.format(i, j, l)
-                    sub_clause = [-grid_mapping[predicate], -grid_mapping[sub_predicate]]
-                    sudoku_cnf.add_clause(sub_clause)
-
-            sudoku_cnf.add_clause(clause)
-
-    for i in range(1, 10):
-        for j in range(1, 10):
-            for k in range(1, 10):
+    for i in range(9):
+        for j in range(9):
+            for k in range(9):
                 predicate = 'grid_{}_{}_{}'.format(i, k, j)
 
                 for l in range(k + 1, 10):
@@ -67,9 +52,9 @@ def add_clauses(grid, grid_mapping):
                     clause = [-grid_mapping[predicate], -grid_mapping[sub_predicate]]
                     sudoku_cnf.add_clause(clause)
 
-    for i in range(1, 10):
-        for j in range(1, 10):
-            for k in range(1, 10):
+    for i in range(9):
+        for j in range(9):
+            for k in range(9):
                 predicate = 'grid_{}_{}_{}'.format(k, i, j)
 
                 for l in range(k + 1, 10):
@@ -81,7 +66,7 @@ def add_clauses(grid, grid_mapping):
         for j in 1, 4, 7:
             for k in range(i, i + 3):
                 for l in range(j, j + 3):
-                    for m in range(1, 10):
+                    for m in range(9):
                         predicate = 'grid_{}_{}_{}'.format(k, l, m)
 
                         for n in range(i, i + 3):
@@ -98,6 +83,19 @@ def add_clauses(grid, grid_mapping):
                 sudoku_cnf.add_clause([grid_mapping[predicate]])
 
     return sudoku_cnf
+
+def add_square_clauses(sudoku_cnf, grid_mapping):
+    for i in range(9):
+        for j in range(9):
+            sqr_clause = []
+
+            for k in range(9):
+                sqr_clause += [grid_mapping[i][j][k]]
+
+                for l in range(k + 1, 9):
+                    sudoku_cnf.add_clause([-grid_mapping[i][j][k], -grid_mapping[i][j][l]])
+
+            sudoku_cnf.add_clause(sqr_clause)
 
 def print_grid(sudoku_solved, simple_out):
     sudoku = [[0] * 9 for i in range(9)]
